@@ -1,8 +1,10 @@
 #imageContainer {
-  width: 100%;
+/*  width: 100%;*/
 /*  height: 100%;*/
-  height: 600px;
+/*  height: 600px;*/
   position: absolute;
+  width: 100vw;
+  height: 90vh;
 }
 
 #imagePane {
@@ -12,7 +14,7 @@
 }
 
 #buttonPanel {
-  width: 600px;
+  width: 100%;
 }
 
 #commandCenter {
@@ -22,4 +24,9 @@
 #infoPanel {
   float: left;
   width: 50px;
+}
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
