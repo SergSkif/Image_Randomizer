@@ -10,179 +10,211 @@
     <script type="text/javascript" src="js/jquery.js"></script>
 </head>  
 
-  <script>
-    
-    // Initialize the image URLs array
-    let imageURLs = [];
-    
-    // Populate imageURLs array by getting the image URLs from the specified txt file under the /txt directory
-    $.get('txt/imageURLs4.txt',{},function(content) {
-      const response = content.split('\n');
-      console.log(`imageURLs4.txt contains ${response.length} lines`);
-      console.log(`First line : ${response[0]}`);
-      // This can't be the best way to do this but whatever...
-      for (let i = 0; i < response.length; i++) {
-        imageURLs.push(response[i]);
-      }
-      console.log(`imageURLs inside get request:\n ${imageURLs}`);
-    });
-    
-    // Initialize imageHistory array and historyIndex
-    let imageHistory = [];  // Used to hold image history in the form of indices from imageURLs
-    let historyIndex = 0;   // Used to track place in image history (0 = current head)
-    
-    /*
-     * Updates the image, imageHistory, and imageNumberDisplay based on newIndex
-     */
-    const updateImage = function(newIndex) {
-      console.log("Updating image to index " + newIndex + ", URL: " + imageURLs[newIndex]);
-      const newURL = imageURLs[newIndex];
-      var imagePane = document.getElementById('imagePane');
-      const timestamp = new Date().getTime();  
-      const queryString = "?t=" + timestamp;    
-      imagePane.src = newURL + queryString;
-      updateImageNumberDisplay(newIndex);
-    };
-    
-    /*
-     * Set image index to random value in range and update the image
-     */
-    const randomizeImage = function() {
-      console.log("Randomizing image...");
-      const randIndex = Math.floor((Math.random() * imageURLs.length + 1));
-      updateImage(randIndex);
-      updateImageHistory(randIndex);
-    };
-    
-    /*
-     * Updates the number displayed above the image representing the image's index in imageURLs
-     */
-    const updateImageNumberDisplay = function(newIndex) {
-      var imageNumberDisplay = document.getElementById('imageNumberDisplay');
-      imageNumberDisplay.innerHTML = newIndex;
-    };
-    
-    /*
-     * Updates imageHistory array with provided imageURLs index
-     * If not at head of imageHistory array, resets history to current historyIndex
-     */
-    const updateImageHistory = function(newIndex){
-      console.log("Updating image history...");
-      // Check if history is being rewritten from current, non-head index
-      if (historyIndex !== 0) {
-        imageHistory = imageHistory.slice(historyIndex, imageHistory.length + 1);
-        historyIndex = 0;
-      } else {
-        // Add new index to head of imageHistory
-        imageHistory.unshift(newIndex);
-      }
-      console.log("imageHistory: " + imageHistory);
-      console.log("historyIndex: " + historyIndex);
-    };
-    
-    /* 
-     * Step forward to the next sequential image index 
-     * in the imageURLs array and update the image accordingly
-     * If already at end of imageURLs, cycle back to beginning
-     */
-    const nextImageSequential = function() {
-      console.log("Stepping to next sequential image index...");
-      let newIndex = imageHistory[historyIndex] + 1;
-      if (newIndex >= imageURLs.length - 1) newIndex = 0;
-      updateImage(newIndex);
-      updateImageHistory(newIndex);
-    };
-    
-    /*
-     * Step backward to the previous sequential image index 
-     * in the imageURLs array and update the image accordingly
-     * If already at beginning of imageURLs, jump to end
-     */
-    const prevImageSequential = function() {
-      console.log("Stepping to previous sequential image index...");
-      let newIndex = imageHistory[historyIndex] - 1;
-      if (newIndex < 0) newIndex = imageURLs.length - 1;
-      updateImage(newIndex);
-      updateImageHistory(newIndex);
-    };
-    
-    /* 
-     * Step forward to the next image in history and update historyIndex
-     * Do nothing if already at the end of history
-     */
-    const nextImageInHistory = function() {
-      console.log("Stepping forward to next image in history...");
-      if (historyIndex > 0) {
-        historyIndex--;
-        updateImage(imageHistory[historyIndex]);
-//        updateImageHistory(imageHistory[historyIndex]);
-      } else {
-        console.log("Already at end of history");
-      }
-    };
-    
-    /*
-     * Step backward to the previous image in history and update historyIndex
-     * Do nothing if already at the beginning of history
-     */
-    const prevImageInHistory = function() {
-      console.log("Stepping backward to previous image in history...");
-      if (historyIndex < imageHistory.length - 1) {
-        historyIndex++;
-        updateImage(imageHistory[historyIndex]);
-//        updateImageHistory(imageHistory[historyIndex]);
-      } else {
-        console.log("Already at beginning of history");
-      }
-    };
-    
-    /*
-     * Zooms in on the current image
-     */
-    const zoomIn = function() {
-      // TODO
-      console.log("This functionality is not yet implemented.");
-    };
-    
-    /*
-     * Zooms out from the current image
-     */
-    const zoomOut = function() {
-      // TODO
-      console.log("This functionality is not yet implemented.");
-    };
-    
-    // Initialize
-    const init = function() {
-      updateImage(0);         // Initialize image to first image in imageURLs
-      updateImageHistory(0);  // Initialize imageHistory array to match
-      console.log("imageHistory initialized to: " + imageHistory);
-      console.log("historyIndex initialized to: " + historyIndex);
-    };
-    
-  </script>
+<script>
+
+  /*
+   * TODO (Currently doesn't work...)
+   * Initialize the dropdown of image sets using the files located in the /txt directory
+   */
+  /*
+  const initImagesetDropdown = function() {
+    const fs = require('fs');
+    const imagesets = fs.readdirSync('/txt');
+    console.log("imagesets: " + imagesets);
+  };
+  */
+
+  // Initialize the image URLs array
+  let imageURLs = [];
+
+  // Populate imageURLs array by getting the image URLs from the specified txt file under the /txt directory
+  $.get('txt/imageURLs4.txt',{},function(content) {
+    const response = content.split('\n');
+    console.log(`imageURLs4.txt contains ${response.length} lines`);
+    console.log(`First line : ${response[0]}`);
+    // This can't be the best way to do this but whatever...
+    for (let i = 0; i < response.length; i++) {
+      imageURLs.push(response[i]);
+    }
+    console.log(`imageURLs inside get request:\n ${imageURLs}`);
+  });
+
+  // Initialize imageHistory array and historyIndex
+  let imageHistory = [];  // Used to hold image history in the form of indices from imageURLs
+  let historyIndex = 0;   // Used to track place in image history (0 = current head)
+
+  /*
+   * Updates the image, imageHistory, and imageNumberDisplay based on newIndex
+   */
+  const updateImage = function(newIndex) {
+    console.log("Updating image to index " + newIndex + ", URL: " + imageURLs[newIndex]);
+    const newURL = imageURLs[newIndex];
+    var imagePane = document.getElementById('imagePane');
+    const timestamp = new Date().getTime();  
+    const queryString = "?t=" + timestamp;    
+    imagePane.src = newURL + queryString;
+    updateImageNumberDisplay(newIndex);
+  };
+
+  /*
+   * Set image index to random value in range and update the image
+   */
+  const randomizeImage = function() {
+    console.log("Randomizing image...");
+    const randIndex = Math.floor((Math.random() * imageURLs.length + 1));
+    updateImage(randIndex);
+    updateImageHistory(randIndex);
+  };
+
+  /*
+   * Updates the number displayed above the image representing the image's index in imageURLs
+   */
+  const updateImageNumberDisplay = function(newIndex) {
+    var imageNumberDisplay = document.getElementById('imageNumberDisplay');
+    imageNumberDisplay.innerHTML = newIndex;
+  };
+
+  /*
+   * Updates imageHistory array with provided imageURLs index
+   * If not at head of imageHistory array, resets history to current historyIndex
+   */
+  const updateImageHistory = function(newIndex){
+    console.log("Updating image history...");
+    // Check if history is being rewritten from current, non-head index
+    if (historyIndex !== 0) {
+      imageHistory = imageHistory.slice(historyIndex, imageHistory.length + 1);
+      historyIndex = 0;
+    } else {
+      // Add new index to head of imageHistory
+      imageHistory.unshift(newIndex);
+    }
+    console.log("imageHistory: " + imageHistory);
+    console.log("historyIndex: " + historyIndex);
+  };
+
+  /* 
+   * Step forward to the next sequential image index 
+   * in the imageURLs array and update the image accordingly
+   * If already at end of imageURLs, cycle back to beginning
+   */
+  const nextImageSequential = function() {
+    console.log("Stepping to next sequential image index...");
+    let newIndex = imageHistory[historyIndex] + 1;
+    if (newIndex >= imageURLs.length - 1) newIndex = 0;
+    updateImage(newIndex);
+    updateImageHistory(newIndex);
+  };
+
+  /*
+   * Step backward to the previous sequential image index 
+   * in the imageURLs array and update the image accordingly
+   * If already at beginning of imageURLs, jump to end
+   */
+  const prevImageSequential = function() {
+    console.log("Stepping to previous sequential image index...");
+    let newIndex = imageHistory[historyIndex] - 1;
+    if (newIndex < 0) newIndex = imageURLs.length - 1;
+    updateImage(newIndex);
+    updateImageHistory(newIndex);
+  };
+
+  /* 
+   * Step forward to the next image in history and update historyIndex
+   * Do nothing if already at the end of history
+   */
+  const nextImageInHistory = function() {
+    console.log("Stepping forward to next image in history...");
+    if (historyIndex > 0) {
+      historyIndex--;
+      updateImage(imageHistory[historyIndex]);
+    } else {
+      console.log("Already at end of history");
+    }
+  };
+
+  /*
+   * Step backward to the previous image in history and update historyIndex
+   * Do nothing if already at the beginning of history
+   */
+  const prevImageInHistory = function() {
+    console.log("Stepping backward to previous image in history...");
+    if (historyIndex < imageHistory.length - 1) {
+      historyIndex++;
+      updateImage(imageHistory[historyIndex]);
+    } else {
+      console.log("Already at beginning of history");
+    }
+  };
+
+  /*
+   * Zooms in on the current image
+   */
+  const zoomIn = function() {
+    // TODO
+    console.log("This functionality is not yet implemented.");
+  };
+
+  /*
+   * Zooms out from the current image
+   */
+  const zoomOut = function() {
+    // TODO
+    console.log("This functionality is not yet implemented.");
+  };
   
-  <body onload='init()'>
-    <span id='commandCenter'>
-      <div id='buttonPanel'>
-        <button id='randomizeButton' onclick='randomizeImage()'>Randomize Image</button>
-        <button id='prevSeq' onclick='prevImageSequential()'>Previous Sequential</button>
-        <button id='nextSeq' onclick='nextImageSequential()'>Next Sequential</button>
-        <button id='prevHist' onclick='prevImageInHistory()'>Back</button>
-        <button id='nextHist' onclick='nextImageInHistory()'>Forward</button>
-        <button id='zoomIn' class='disabled' onclick='zoomIn()'>Zoom In</button>
-        <button id='zoomOut' class='disabled' onclick='zoomOut()'>Zoom Out</button>
-        
-      </div>
-      <div id='infoPanel'>
-        <p id='imageNumberDisplay'>0</p>
-      </div>
-    </span>
+  // Allow keyboard controls
+  document.onkeydown = function (event) {
+    switch (event.keyCode) {
+      case 13:
+        randomizeImage();
+        break;
+      case 37:
+        prevImageInHistory();
+        break;
+      case 38:
+        nextImageSequential();
+        break;
+      case 39:
+        nextImageInHistory();
+        break;
+      case 40:
+        prevImageSequential();
+        break;
+    }
+  };
 
-    <br>
-    <div id='imageContainer'>
-      <img id = 'imagePane' src='https://78.media.tumblr.com/b75059ca1d2505af635ea8a96be325e5/tumblr_om46hfU9th1ucb7d5o5_1280.jpg'>  
+  // Initialize
+  const init = function() {
+    updateImage(0);         // Initialize image to first image in imageURLs
+    updateImageHistory(0);  // Initialize imageHistory array to match
+    console.log("imageHistory initialized to: " + imageHistory);
+    console.log("historyIndex initialized to: " + historyIndex);
+    //initImagesetDropdown();
+  };
+
+</script>
+
+<body onload='init()'>
+  <span id='commandCenter'>
+    <div id='buttonPanel'>
+      <button id='randomizeButton' onclick='randomizeImage()'>Randomize Image</button>
+      <button id='prevSeq' onclick='prevImageSequential()'>Previous Sequential</button>
+      <button id='nextSeq' onclick='nextImageSequential()'>Next Sequential</button>
+      <button id='prevHist' onclick='prevImageInHistory()'>Back</button>
+      <button id='nextHist' onclick='nextImageInHistory()'>Forward</button>
+      <button id='zoomIn' class='disabled' onclick='zoomIn()'>Zoom In</button>
+      <button id='zoomOut' class='disabled' onclick='zoomOut()'>Zoom Out</button>
+
     </div>
+    <div id='infoPanel'>
+      <p id='imageNumberDisplay'>0</p>
+    </div>
+  </span>
 
-  </body>
+  <br>
+  <div id='imageContainer'>
+    <img id = 'imagePane' src='https://78.media.tumblr.com/b75059ca1d2505af635ea8a96be325e5/tumblr_om46hfU9th1ucb7d5o5_1280.jpg'>  
+  </div>
+
+</body>
 </html>
