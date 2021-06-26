@@ -1,0 +1,25 @@
+#imageContainer {
+  width: 100%;
+/*  height: 100%;*/
+  height: 600px;
+  position: absolute;
+}
+
+#imagePane {
+  object-fit: contain;
+  width: inherit;
+  height: inherit;
+}
+
+#buttonPanel {
+  width: 600px;
+}
+
+#commandCenter {
+  height: 24px;
+}
+
+#infoPanel {
+  float: left;
+  width: 50px;
+}

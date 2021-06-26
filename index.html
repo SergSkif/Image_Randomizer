@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="description" content="Image Randomizer">
+    <meta name="author" content="Timmy Wormwood">
+    <meta charset="UTF-8">
+    <title>Image Randomizer</title>
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet"> 
+    <script type="text/javascript" src="js/jquery.js"></script>
+</head>  
+
+  <script>
+    
+    // Get the image URLs from the specified txt file under the /txt directory
+    var imageURLs = [];
+    $.get('txt/imageURLs4.txt',{},function(content){
+      let response=content.split('\n');
+      console.log(`imageURLs4.txt contains ${response.length} lines`);
+      console.log(`First line : ${response[0]}`);
+      // This can't be the best way to do this but whatever...
+      for (i = 0; i < response.length; i++) {
+        imageURLs.push(response[i]);
+      }
+      console.log(`imageURLs inside get request:\n ${imageURLs}`);
+    });
+        
+    var imageHistory = new Array(0);
+    var historyIndex = 0;
+    
+    console.log("imageHistory initialized to: " + imageHistory);
+    console.log("historyIndex initialized to: " + historyIndex);
+    
+    var updateImage = function(newIndex){
+      var newURL = imageURLs[newIndex];
+      var imagePane = document.getElementById("imagePane");
+      var timestamp = new Date().getTime();  
+      var queryString = "?t=" + timestamp;    
+      imagePane.src = newURL + queryString;
+      updateImageNumberDisplay(newIndex);
+      console.log("Changing URL to " + imageURLs[newIndex]);
+    }
+    
+    var randomizeImage = function(){
+      console.log("imageURLs: " + imageURLs);
+      var randIndex = Math.floor((Math.random() * imageURLs.length + 1));
+      if (historyIndex != imageHistory.length - 1) {
+        imageHistory = imageHistory.slice(0, historyIndex + 1);
+      }
+      updateImageHistory(randIndex);
+      updateImage(randIndex);
+    }
+    
+    var updateImageNumberDisplay = function(newIndex){
+      var imageNumberDisplay = document.getElementById('imageNumberDisplay');
+      imageNumberDisplay.innerHTML = newIndex;
+    }
+    
+    var updateImageHistory = function(newIndex){
+      imageHistory.push(newIndex);
+      historyIndex = imageHistory.length - 1;
+      console.log(imageHistory);
+      console.log(historyIndex);
+    }
+    
+    // Step backwards to the previously viewed image
+    var prevImage = function(){
+      if (historyIndex > 0) {
+        historyIndex--;
+        console.log("new index: " + historyIndex);
+        var newIndex = imageHistory[historyIndex];
+        console.log("new imageIndex: " + newIndex);
+        updateImage(newIndex);
+      }
+    }
+    
+    // Step forward to the next image in history OR, if
+    //   at the end of history, then the next image in order.
+    var nextImage = function(){
+      historyIndex++;
+      if (historyIndex < imageHistory.length - 1) {
+        var newIndex = imageHistory[historyIndex];
+      } else {
+        var currentIndex = imageHistory[historyIndex - 1];
+        if (currentIndex >= imageURLs.length - 1) {
+          var newIndex = 0;
+        } else {
+          var newIndex = currentIndex + 1;
+        }
+      }
+      updateImageHistory(newIndex);
+      console.log("new historyIndex: " + historyIndex);
+      console.log("new imageIndex: " + newIndex);
+      updateImage(newIndex);
+    }
+    
+    // Initialize
+    updateImage(0);
+    console.log("imageHistory initialized to: " + imageHistory);
+    console.log("historyIndex initialized to: " + historyIndex);
+    
+  </script>
+  
+  <body>
+    <span id='commandCenter'>
+      <div id='buttonPanel'>
+        <button id='randomizeButton' onclick='randomizeImage()'>Randomize Image</button>
+        <button id='zoomIn' onclick='zoomIn()'>Zoom In</button>
+        <button id='zoomOut' onclick='zoomOut()'>Zoom Out</button>
+        <button id='prev' onclick='prevImage()'>Previous</button>
+        <button id='next' onclick='nextImage()'>Next</button>
+      </div>
+      <div id='infoPanel'>
+        <p id='imageNumberDisplay'>0</p>
+      </div>
+    </span>
+
+    <br>
+    <div id='imageContainer'>
+      <img id = 'imagePane' src='https://66.media.tumblr.com/425b169e2fdbff259eb3901f4ef0cdd1/tumblr_ngx3bqu3kb1tk4zjmo3_400.gifv'>  
+    </div>
+
+  </body>
+</html>
